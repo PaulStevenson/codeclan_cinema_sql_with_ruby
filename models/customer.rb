@@ -11,6 +11,8 @@ class Customer
     @fund = options['fund'].to_i
   end
 
+
+
   def save()
     sql = 'INSERT INTO customers (name, fund)
     VALUES ($1, $2)
@@ -32,22 +34,47 @@ class Customer
     SqlRunner.run(sql, values)
   end
 
-  ##CLASS
-  def self.map_items(customer_data)
-    result = customer_data.map { |customer| Customer.new( customer ) }
-    return result
+  def films()
+    sql = 'SELECT films.* FROM films
+    INNER JOIN tickets
+    ON tickets.film_id = films.id
+    WHERE customer_id = $1'
+    values = [@id]
+    film_data = SqlRunner.run(sql, values)
+    return Film.map_items(film_data)
   end
 
-  def self.all()
-    sql = 'SELECT * FROM customers'
-    customer_data = SqlRunner.run(sql)
-    return Customer.map_items(customer_data)
+  def deduct_funds(price)
+    @funds = @funds - price
   end
 
-  def self.delete_all()
-    sql = "DELETE FROM customers"
-    SqlRunner.run(sql)
+    # def locations()
+    #   sql = "SELECT locations.*
+    #   FROM locations
+    #   INNER JOIN visits
+    #   ON visits.location_id = locations.id
+    #   WHERE user_id = $1"
+    #   values = [@id]
+    #   location_data = SqlRunner.run(sql, values)
+    #   return Location.map_items(location_data)
+    # end
+
+    ##CLASS
+    def self.map_items(customer_data)
+      result = customer_data.map { |customer| Customer.new( customer ) }
+      return result
+    end
+
+    def self.all()
+      sql = 'SELECT * FROM customers'
+      customer_data = SqlRunner.run(sql)
+      return Customer.map_items(customer_data)
+    end
+
+    def self.delete_all()
+      sql = "DELETE FROM customers"
+      SqlRunner.run(sql)
+    end
+
+
   end
-
-
-end

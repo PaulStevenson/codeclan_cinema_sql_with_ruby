@@ -1,4 +1,5 @@
 require_relative("../db/sql_runner")
+require('pry')
 
 class Film
 
@@ -30,7 +31,17 @@ attr_accessor :title, :price
     sql = "UPDATE films SET (title, price) = ($1, $2) WHERE id = $3"
     values = [@title, @price, @id]
     SqlRunner.run(sql, values)
-  end 
+  end
+
+  def customers()
+    sql = 'SELECT customers.* FROM customers
+    INNER JOIN tickets
+    ON tickets.customer_id = customers.id
+    WHERE film_id = $1'
+    values = [@id]
+    customer_data = SqlRunner.run(sql, values)
+    return Customer.map_items(customer_data)
+  end
 
   ##CLASS
   def self.map_items(film_data)
